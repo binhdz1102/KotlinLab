@@ -19,6 +19,10 @@ data class RestorableMenuItem<T>(val data: T, val route: String = "<Item>") : Me
 /**
  * Triển khai RestorableMenu, lớp composite chứa các thành phần RestorableMenuItem hoặc RestorableMenu.
  * Nếu route không được khai báo thì mặc định là "<Menu>"
+ * RestorableMenu được triển khai với Memento có thể lưu trữ và khôi phục trạng thái
+ * của Menu:
+ * - restore(memento): xóa toàn bộ danh sách children hiện tại và thay thế bằng snapshot đã lưu
+ * - deepCopy(): tạo một bản sao độc lập của cây Menu
  */
 class RestorableMenu<T>(val route: String = "<Menu>", override var parent: Menu<T>? = null) : Menu<T> {
     private val children = mutableListOf<Menu<T>>()
@@ -86,58 +90,109 @@ class RestorableMenu<T>(val route: String = "<Menu>", override var parent: Menu<
         }
         return null
     }
+
+    /**
+     * Memento lưu trữ trạng thái của danh sách children
+     */
+    data class Memento<T>(val childrenSnapshot: List<Menu<T>>)
+
+    /**
+     * Tạo một snapshot (deep copy) của trạng thái hiện tại.
+     */
+    fun createMemento(): Memento<T> {
+        val snapshot = children.map { child ->
+            when (child) {
+                is RestorableMenu -> child.deepCopy()
+                is RestorableMenuItem -> child.copy().also { it.parent = null }
+                else -> child
+            }
+        }
+        return Memento(snapshot)
+    }
+
+    /**
+     * Khôi phục trạng thái từ memento.
+     */
+    fun restore(memento: Memento<T>) {
+        children.clear()
+        // Khi restore, cập nhật lại parent cho từng thành phần.
+        memento.childrenSnapshot.forEach { child ->
+            when (child) {
+                is RestorableMenu -> {
+                    child.parent = this
+                    children.add(child)
+                }
+
+                is RestorableMenuItem -> {
+                    child.parent = this
+                    children.add(child)
+                }
+
+                else -> children.add(child)
+            }
+        }
+    }
+
+    /**
+     * Deep copy của RestorableMenu
+     */
+    fun deepCopy(): RestorableMenu<T> {
+        val copy = RestorableMenu<T>(route)
+        children.forEach { child ->
+            when (child) {
+                is RestorableMenu -> {
+                    val childCopy = child.deepCopy()
+                    childCopy.parent = copy
+                    copy.children.add(childCopy)
+                }
+
+                is RestorableMenuItem -> {
+                    val itemCopy = child.copy()
+                    itemCopy.parent = copy
+                    copy.children.add(itemCopy)
+                }
+
+                else -> copy.children.add(child)
+            }
+        }
+        return copy
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
 //fun main() {
-//    // Tạo Menu gốc
+//    // Khai báo Menu
 //    val rootMenu = RestorableMenu<String>(route = "Main Menu")
-//
-//    // Thêm các mục đơn giản vào menu gốc
 //    rootMenu.add("Home", route = "homeroute")
 //    rootMenu.add("About")
-//
-//    // Tạo RestorableMenu con "Products" (sử dụng route mặc định "<Menu>")
 //    val productsMenu = RestorableMenu<String>()
 //    productsMenu.add("Product A")
 //    productsMenu.add("Product B", route = "routeB")
-//
-//    // Tạo RestorableMenu con lồng "Services" bên trong "Products"
 //    val servicesMenu = RestorableMenu<String>(route = "Services")
 //    servicesMenu.add("Service A")
 //    servicesMenu.add("Service B")
-//
-//    // Thêm "Services" vào "Products"
 //    productsMenu.add(servicesMenu)
-//
-//    // Thêm "Products" vào menu gốc
 //    rootMenu.add(productsMenu)
 //
-//    // In toàn bộ cấu trúc menu
+//    // Cấu trúc Menu
 //    println("===== Menu Structure =====")
 //    rootMenu.printStructure()
 //
-//    // Tìm một phần tử có dữ liệu là "Service A"
-//    val found = rootMenu.find {
-//        it is RestorableMenuItem && it.data == "Service A"
-//    }
-//
-//    println("\n===== Search Result =====")
-//    if (found != null && found is RestorableMenuItem) {
-//        println("Found route: ${found.route}")
-//        println("Found item: ${found.data}")
-//        println("Parent menu: ${(found.parent as? RestorableMenu)?.route}")
-//        println("Root menu: ${(found.getRoot() as RestorableMenu).route}")
-//    } else {
-//        println("Item not found")
-//    }
-//
-//
-//    println("===== Cấu trúc Menu ban đầu =====")
-//    rootMenu.printStructure()
+//    // Lưu trạng thái hiện tại của menu trước khi xóa (tạo memento)
+//    val savedState = rootMenu.createMemento()
 //
 //    // Ví dụ: xóa item có dữ liệu "Product A"
 //    val removed = rootMenu.removeItem { it == "Product A" }
 //    println("\n===== Sau khi xóa 'Product A' (removed: $removed) =====")
+//    rootMenu.printStructure()
+//
+//    // Ví dụ: xóa item có dữ liệu "Home"
+//    val removed2 = rootMenu.removeItem { it == "Home" }
+//    println("\n===== Sau khi xóa 'Home' (removed: $removed2) =====")
+//    rootMenu.printStructure()
+//
+//    // Khôi phục lại trạng thái menu từ memento đã lưu
+//    rootMenu.restore(savedState)
+//    println("\n===== Sau khi khôi phục trạng thái =====")
 //    rootMenu.printStructure()
 //}
