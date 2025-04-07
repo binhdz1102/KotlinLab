@@ -161,39 +161,44 @@ class RestorableMenu<T>(val route: String = "<Menu>", override var parent: Menu<
 }
 
 //////////////////////////////////////////////////////////////////////
-//fun main() {
-//    // Khai báo Menu
-//    val rootMenu = RestorableMenu<String>(route = "Main Menu")
-//    rootMenu.add("Home", route = "homeroute")
-//    rootMenu.add("About")
-//    val productsMenu = RestorableMenu<String>()
-//    productsMenu.add("Product A")
-//    productsMenu.add("Product B", route = "routeB")
-//    val servicesMenu = RestorableMenu<String>(route = "Services")
-//    servicesMenu.add("Service A")
-//    servicesMenu.add("Service B")
-//    productsMenu.add(servicesMenu)
-//    rootMenu.add(productsMenu)
-//
-//    // Cấu trúc Menu
-//    println("===== Menu Structure =====")
-//    rootMenu.printStructure()
-//
-//    // Lưu trạng thái hiện tại của menu trước khi xóa (tạo memento)
-//    val savedState = rootMenu.createMemento()
-//
-//    // Ví dụ: xóa item có dữ liệu "Product A"
-//    val removed = rootMenu.removeItem { it == "Product A" }
-//    println("\n===== Sau khi xóa 'Product A' (removed: $removed) =====")
-//    rootMenu.printStructure()
-//
-//    // Ví dụ: xóa item có dữ liệu "Home"
-//    val removed2 = rootMenu.removeItem { it == "Home" }
-//    println("\n===== Sau khi xóa 'Home' (removed: $removed2) =====")
-//    rootMenu.printStructure()
-//
-//    // Khôi phục lại trạng thái menu từ memento đã lưu
-//    rootMenu.restore(savedState)
-//    println("\n===== Sau khi khôi phục trạng thái =====")
-//    rootMenu.printStructure()
-//}
+fun main() {
+    // Khai báo Menu
+    val rootMenu = RestorableMenu<String>(route = "Main Menu")
+    rootMenu.add("Home", route = "homeroute")
+    rootMenu.add("About")
+    val productsMenu = RestorableMenu<String>()
+    productsMenu.add("Product A")
+    productsMenu.add("Product B", route = "routeB")
+    val servicesMenu = RestorableMenu<String>(route = "Services")
+    servicesMenu.add("Service A")
+    servicesMenu.add("Service B")
+    productsMenu.add(servicesMenu)
+    rootMenu.add(productsMenu)
+
+    // Cấu trúc Menu
+    println("===== Menu Structure =====")
+    rootMenu.printStructure()
+
+    // Lưu trạng thái hiện tại của menu trước khi xóa (tạo memento)
+    val savedState = rootMenu.createMemento()
+
+    // Ví dụ: xóa item có dữ liệu "Product A"
+    val removed = rootMenu.removeItem { it == "Product A" }
+    println("\n===== Sau khi xóa 'Product A' (removed: $removed) =====")
+    rootMenu.printStructure()
+
+    // Ví dụ: xóa item có dữ liệu "Product B"
+    val removed1 = rootMenu.removeItem { it == "Product B" }
+    println("\n===== Sau khi xóa 'Product B' (removed: $removed1) =====")
+    rootMenu.printStructure()
+
+    // Ví dụ: xóa item có dữ liệu "Home"
+    val removed2 = rootMenu.removeItem { it == "Home" }
+    println("\n===== Sau khi xóa 'Home' (removed: $removed2) =====")
+    rootMenu.printStructure()
+
+    // Khôi phục lại trạng thái menu từ memento đã lưu
+    rootMenu.restore(savedState)
+    println("\n===== Sau khi khôi phục trạng thái =====")
+    rootMenu.printStructure()
+}
