@@ -33,6 +33,7 @@ class RestorableMenu<T>(val route: String = "<Menu>", override var parent: Menu<
         menu.parent = this
         children.add(menu)
     }
+
     fun removeItem(predicate: (T) -> Boolean): Boolean {
         var removed = false
         val iterator = children.iterator()
@@ -44,6 +45,7 @@ class RestorableMenu<T>(val route: String = "<Menu>", override var parent: Menu<
                         removed = true
                     }
                 }
+
                 is RestorableMenu -> {
                     if (child.removeItem(predicate)) {
                         removed = true
