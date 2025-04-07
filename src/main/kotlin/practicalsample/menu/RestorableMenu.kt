@@ -134,7 +134,8 @@ class RestorableMenu<T>(val route: String = "<Menu>", override var parent: Menu<
     }
 
     /**
-     * Deep copy của RestorableMenu
+     * Deep copy của RestorableMenu:
+     * tạo một bản sao độc lập của cây con hiện tại.
      */
     fun deepCopy(): RestorableMenu<T> {
         val copy = RestorableMenu<T>(route)
