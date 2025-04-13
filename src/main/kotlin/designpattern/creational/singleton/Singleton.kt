@@ -1,5 +1,8 @@
-package designpattern.creational
+package designpattern.creational.singleton
 
+/**
+ * Singleton
+ */
 object MySingleton {
     // Các biến trạng thái nội tại
     var counter: Int = 0

@@ -1,5 +1,8 @@
-package designpattern.creational
+package designpattern.creational.factory
 
+/**
+ * Triển khai mẫu Factory cơ bản
+ */
 sealed interface Shape {
     fun draw()
 }

@@ -1,5 +1,9 @@
-package designpattern.behavior
+package designpattern.behavior.observer
 
+/**
+ * Triển khai mẫu Observer cho phép nhiều đối tượng lắng nghe sự kiện
+ * từ 1 nguồn.
+ */
 interface Observer<T> {
     fun onDataUpdated(data: T) // callback thực hiện lắng nghe data T
 }
